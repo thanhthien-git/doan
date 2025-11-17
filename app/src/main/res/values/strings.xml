@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">System Monitor</string>
+    <string name="cpu">CPU</string>
+    <string name="ram">RAM</string>
+    <string name="battery">Battery</string>
+</resources>
