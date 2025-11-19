@@ -6,7 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.example.doan.R;
 import com.example.doan.CpuReader;
 import com.github.mikephil.charting.charts.LineChart;
@@ -14,8 +17,9 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import java.util.ArrayList;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
 
 public class FragmentCpu extends Fragment {
     private TextView tvCpuUsage;
@@ -25,8 +29,9 @@ public class FragmentCpu extends Fragment {
     private ArrayList<Entry> entries = new ArrayList<>();
     private int entryCount = 0;
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cpu, container, false);
 
         tvCpuUsage = view.findViewById(R.id.tv_cpu_usage);
@@ -35,6 +40,32 @@ public class FragmentCpu extends Fragment {
 
         setupChart();
         startMonitoring();
+
+        // Setup Bottom Navigation
+        BottomNavigationView bottomNav = view.findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_cpu); // Đặt item hiện tại
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_cpu) {
+                // Đã ở CPU rồi, không làm gì
+                return true;
+            } else if (itemId == R.id.nav_ram) {
+                selectedFragment = new FragmentRam();
+            } else if (itemId == R.id.nav_battery) {
+                selectedFragment = new FragmentBattery();
+            }
+
+            if (selectedFragment != null) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, selectedFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+            return true;
+        });
 
         return view;
     }

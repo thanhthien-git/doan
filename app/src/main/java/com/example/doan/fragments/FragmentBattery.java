@@ -11,17 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.example.doan.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
-
-import com.example.doan.R;
-
 
 public class FragmentBattery extends Fragment {
 
@@ -57,8 +59,9 @@ public class FragmentBattery extends Fragment {
         }
     };
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_battery, container, false);
 
         tvBatteryLevel = view.findViewById(R.id.tv_battery_level);
@@ -70,6 +73,32 @@ public class FragmentBattery extends Fragment {
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         requireContext().registerReceiver(batteryReceiver, filter);
+
+        // Setup Bottom Navigation
+        BottomNavigationView bottomNav = view.findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_battery); // Đặt item hiện tại
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_battery) {
+                // Đã ở Battery rồi, không làm gì
+                return true;
+            } else if (itemId == R.id.nav_cpu) {
+                selectedFragment = new FragmentCpu();
+            } else if (itemId == R.id.nav_ram) {
+                selectedFragment = new FragmentRam();
+            }
+
+            if (selectedFragment != null) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, selectedFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+            return true;
+        });
 
         return view;
     }

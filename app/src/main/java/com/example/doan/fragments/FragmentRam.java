@@ -9,22 +9,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.example.doan.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 
-import com.example.doan.R;
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FragmentRam#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FragmentRam extends Fragment {
     private TextView tvRamUsed;
     private ProgressBar progressRam;
@@ -33,8 +31,9 @@ public class FragmentRam extends Fragment {
     private ArrayList<Entry> entries = new ArrayList<>();
     private int entryCount = 0;
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_ram, container, false);
 
         tvRamUsed = view.findViewById(R.id.tv_ram_used);
@@ -43,6 +42,32 @@ public class FragmentRam extends Fragment {
 
         setupChart();
         startMonitoring();
+
+        // Setup Bottom Navigation
+        BottomNavigationView bottomNav = view.findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_ram); // Đặt item hiện tại
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_ram) {
+                // Đã ở RAM rồi, không làm gì
+                return true;
+            } else if (itemId == R.id.nav_cpu) {
+                selectedFragment = new FragmentCpu();
+            } else if (itemId == R.id.nav_battery) {
+                selectedFragment = new FragmentBattery();
+            }
+
+            if (selectedFragment != null) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, selectedFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+            return true;
+        });
 
         return view;
     }
