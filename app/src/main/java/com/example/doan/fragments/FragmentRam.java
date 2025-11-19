@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.doan.R;
+import com.example.doan.RamInfo;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -91,22 +92,13 @@ public class FragmentRam extends Fragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
-                ActivityManager activityManager = (ActivityManager)
-                        requireContext().getSystemService(Context.ACTIVITY_SERVICE);
-                activityManager.getMemoryInfo(memInfo);
+                RamInfo ramInfo = RamInfo.getCurrentRamInfo(requireContext());
 
-                long totalMem = memInfo.totalMem / (1024 * 1024);
-                long availMem = memInfo.availMem / (1024 * 1024);
-                long usedMem = totalMem - availMem;
-
-                float usagePercent = (usedMem * 100f) / totalMem;
-
-                tvRamUsed.setText(String.format("%d MB / %d MB", usedMem, totalMem));
+                tvRamUsed.setText(String.format("%d MB / %d MB", ramInfo.getUsedRam(), ramInfo.getTotalRam()));
                 progressRam.setMax(100);
-                progressRam.setProgress((int) usagePercent);
+                progressRam.setProgress((int) ramInfo.getUsagePercent());
 
-                entries.add(new Entry(entryCount++, usagePercent));
+                entries.add(new Entry(entryCount++, ramInfo.getUsagePercent()));
                 if (entries.size() > 30) {
                     entries.remove(0);
                 }
@@ -116,6 +108,7 @@ public class FragmentRam extends Fragment {
             }
         }, 0);
     }
+
 
     private void updateChart() {
         LineDataSet dataSet = new LineDataSet(entries, "RAM Usage");

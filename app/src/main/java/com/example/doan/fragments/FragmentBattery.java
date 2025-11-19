@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.doan.BatteryInfo;
 import com.example.doan.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -70,20 +71,17 @@ public class FragmentBattery extends Fragment {
         batteryChart = view.findViewById(R.id.battery_chart);
 
         setupChart();
-
+        startMonitoring();
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         requireContext().registerReceiver(batteryReceiver, filter);
 
-        // Setup Bottom Navigation
         BottomNavigationView bottomNav = view.findViewById(R.id.bottom_navigation);
-        bottomNav.setSelectedItemId(R.id.nav_battery); // Đặt item hiện tại
-
+        bottomNav.setSelectedItemId(R.id.nav_battery);
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_battery) {
-                // Đã ở Battery rồi, không làm gì
                 return true;
             } else if (itemId == R.id.nav_cpu) {
                 selectedFragment = new FragmentCpu();
@@ -116,6 +114,27 @@ public class FragmentBattery extends Fragment {
         batteryChart.getAxisLeft().setTextColor(getResources().getColor(R.color.text_gray));
         batteryChart.getAxisRight().setEnabled(false);
         batteryChart.getLegend().setEnabled(false);
+    }
+
+    private void startMonitoring() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BatteryInfo batteryInfo = BatteryInfo.getCurrentBatteryInfo(requireContext());
+
+                tvBatteryLevel.setText(String.format("%.0f%%", batteryInfo.getBatteryLevel()));
+                tvBatteryTemp.setText(String.format("Temperature: %.1f°C", batteryInfo.getTemperature()));
+                tvBatteryStatus.setText("Status: " + (batteryInfo.isCharging() ? "Charging" : "Not Charging"));
+
+                entries.add(new Entry(entryCount++, batteryInfo.getBatteryLevel()));
+                if (entries.size() > 30) {
+                    entries.remove(0);
+                }
+
+                updateChart();
+                handler.postDelayed(this, 1000);
+            }
+        }, 0);
     }
 
     private void updateChart() {

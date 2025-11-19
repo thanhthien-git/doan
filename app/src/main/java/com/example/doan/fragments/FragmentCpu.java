@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.doan.R;
-import com.example.doan.CpuReader;
+import com.example.doan.CpuInfo;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -25,7 +25,7 @@ public class FragmentCpu extends Fragment {
     private TextView tvCpuUsage;
     private LineChart cpuChart;
     private Handler handler = new Handler();
-    private CpuReader cpuReader;
+    private CpuInfo cpuReader;
     private ArrayList<Entry> entries = new ArrayList<>();
     private int entryCount = 0;
 
@@ -36,7 +36,7 @@ public class FragmentCpu extends Fragment {
 
         tvCpuUsage = view.findViewById(R.id.tv_cpu_usage);
         cpuChart = view.findViewById(R.id.cpu_chart);
-        cpuReader = new CpuReader();
+        cpuReader = new CpuInfo();
 
         setupChart();
         startMonitoring();

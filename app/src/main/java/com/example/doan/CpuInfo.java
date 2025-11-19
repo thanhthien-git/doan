@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class CpuReader {
+public class CpuInfo {
     private long prevTotal = 0;
     private long prevIdle = 0;
 
